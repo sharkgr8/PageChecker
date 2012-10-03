@@ -24,34 +24,42 @@ class PageChecker extends CBehavior {
 		
 		if(!empty($page))
 		{
+			
 			//Normalizes the page url
 			$url = CHtml::normalizeUrl($page);
+			$pageUrl = '';
 			
 			//if the url passed is the string from the pre-defined keywords
-			if (!is_array($url))
-			{
-				switch($url){
-					case 'homepage':
-						$pageUrl = array('site/index'); //set the homepage url
-						break;
-					case 'contact':
-						$pageUrl = array('site/contact'); //set the contact page url
-						break;
-					case 'about':
-						$pageUrl = array('site/page'); //set the about url
-						break;
-					case 'login':
-						$pageUrl = array('site/login'); //set the login url
-						break;
-				}
-			} else {
+			switch($url){
+				case 'homepage':
+					$pageUrl = array('site/index'); //set the homepage url
+					break;
+				case 'contact':
+					$pageUrl = array('site/contact'); //set the contact page url
+					break;
+				case 'about':
+					$pageUrl = array('site/page'); //set the about url
+					break;
+				case 'login':
+					$pageUrl = array('site/login'); //set the login url
+					break;
+			}
+			
+			if(empty($pageUrl)){
+				$url = str_replace(Yii::app()->baseURL.'/index.php/','',$url);
+				
+				//To account for url rewriting to remove site from the url
+				$pos = strpos($url,'/');
+				if($pos===false)
+					$url = 'site/'.$url;
+					
 				//if the passed value for page parameter is the controller route
-				$pageUrl = array($url[0]); 
+				$pageUrl = array($url); 
 			}
 			
 			if(sizeof($pageUrl)==1){
 				//Get the current page route
-				$route=Yii::app()->getController()->getRoute();
+				$route=Yii::app()->controller->getRoute();
 				
 				//now check whether the specified url is active or not
 				return $this->isPageActive($pageUrl,$route);
